@@ -4,7 +4,7 @@ Turn messy AI-generated changes into clean, safe Git history.
 
 GitX is a portable Git workflow skill for AI coding agents that turns working-tree changes into logical Conventional Commits and handles branches, project checks, safe pull and push workflows, Gitee pull requests and issues, secret scanning, merge and rebase conflict resolution, repository status and history, and commit planning across Agent Skills-compatible tools.
 
-> **Gitee edition** — forked from [musoyangrigor/gitx-skill](https://github.com/musoyangrigor/gitx-skill). PR and issue operations use the official [Gitee CLI](https://gitee.com/oschina/gitee-cli) (`gitee`) instead of `gh`, and follow the official Gitee skill conventions: always `--json` and `--no-tui`, never `--ai`, explicit confirmation before merges, and the `gitee-api` fallback for unsupported operations. Commits, branches, and pushes are plain Git and work with any remote. Authenticate first with `gitee auth login`.
+> **Gitee edition** — forked from [musoyangrigor/gitx-skill](https://github.com/musoyangrigor/gitx-skill), with the seven official Gitee CLI agent skills integrated: the full PR and issue lifecycles, releases, repositories, search, raw API, and Gitee Go pipelines all live under [gitx/references](gitx/references). All platform operations use the official [Gitee CLI](https://gitee.com/oschina/gitee-cli) (`gitee`) instead of `gh`, and follow the official conventions: always `--json` and `--no-tui`, never `--ai`, explicit confirmation before merges and deletions, and the raw-API fallback for unsupported operations. Commits, branches, and pushes are plain Git and work with any remote. Authenticate first with `gitee auth login`.
 
 ## Install
 
@@ -34,6 +34,14 @@ A bare `$gitx` invocation immediately inspects the repository and runs Smart com
 | `$gitx ship dev` | Run the ship workflow and open a PR targeting `dev`. |
 | `$gitx issue Login fails after token expiry` | Create a Gitee issue with a generated title and body. |
 | `$gitx issue ICX4FO` | Read the Gitee issue `ICX4FO` and implement the requested fix in the current working tree. A numeric reference like `123` is resolved to the real identifier with `gitee issue list` first. |
+| `$gitx pr list/view/diff/review/comment/close/reopen/checkout` | Manage existing pull requests. |
+| `$gitx pr merge 42` | Merge pull request #42 after explicit confirmation. |
+| `$gitx issue list/edit/comment/assign/close/reopen/start` | Manage existing issues. |
+| `$gitx release list/view/create/edit/delete` | Manage releases; deleting requires confirmation. |
+| `$gitx repo view/list/clone/create/fork/delete` | Manage repositories; deleting is irreversible. |
+| `$gitx search repos sdk --language Go` | Search repositories, issues, or users across Gitee. |
+| `$gitx api /user` | Call any Gitee V5 REST API endpoint when no first-class command exists. |
+| `$gitx pipeline list -R owner/repo --ref master` | Manage Gitee Go pipelines, repository (`-R`) and project (`-E`/`-P`). |
 | `$gitx resolve` | Resolve an in-progress merge or rebase conflict. |
 | `$gitx check` | Run relevant checks, then create a smart commit. |
 | `$gitx status` | Show repository status without changing anything. |
@@ -81,7 +89,7 @@ Explicit requests override saved preferences, and preferences override inferred 
 
 ## Workflow references
 
-Detailed behavior: [pull requests](gitx/references/pull-requests.md), [Gitee issues](gitx/references/gitee-issues.md), [secret scanning](gitx/references/secret-scanning.md), [shipping](gitx/references/ship.md), [diagnosis](gitx/references/doctor.md), and [splitting edits within one file](gitx/references/same-file-splitting.md).
+Detailed behavior: [pull requests](gitx/references/pull-requests.md), [Gitee issues](gitx/references/gitee-issues.md), [Gitee releases](gitx/references/gitee-release.md), [Gitee repositories](gitx/references/gitee-repo.md), [Gitee search](gitx/references/gitee-search.md), [Gitee API](gitx/references/gitee-api.md), [Gitee Go pipelines](gitx/references/gitee-go.md), [secret scanning](gitx/references/secret-scanning.md), [shipping](gitx/references/ship.md), [diagnosis](gitx/references/doctor.md), and [splitting edits within one file](gitx/references/same-file-splitting.md).
 
 ## Development
 

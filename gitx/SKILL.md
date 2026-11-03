@@ -1,6 +1,6 @@
 ---
 name: gitx
-description: "Portable Git workflow skill for AI coding agents that turns messy AI-generated changes into clean Git history. Use for smart Conventional Commits, logical commit splitting, branches, checks, pull and push, Gitee PRs and issues, secret scanning, commit planning, Git status and history, repository diagnosis, and merge or rebase conflict resolution with Claude Code, OpenAI Codex, Cursor, and other Agent Skills-compatible tools."
+description: "Portable Git workflow skill for AI coding agents that turns messy AI-generated changes into clean Git history. Use for smart Conventional Commits, logical commit splitting, branches, checks, pull and push, the full Gitee platform lifecycle — PRs and issues (create, review, merge), releases, repositories, search, raw API calls, and Gitee Go pipelines — plus secret scanning, commit planning, Git status and history, repository diagnosis, and merge or rebase conflict resolution with Claude Code, OpenAI Codex, Cursor, and other Agent Skills-compatible tools."
 ---
 
 # GitX
@@ -15,7 +15,9 @@ Treat a bare invocation as an action, never as a help request. Do not announce t
 
 Match natural-language requests to the commands below. Route “check my changes” or “show git status” to Status when the user wants a read-only summary; route “run tests before committing” to Checks. Use Doctor for Git workflow diagnosis and Plan for a commit preview. Read supporting references only when their workflow or loading condition applies.
 
-Route `gitx issue` by argument shape, not by the intent implied by its wording. An argument containing only a Gitee issue identifier, such as `ICX4FO` or `#ICX4FO`, selects the existing-issue implementation workflow. A purely numeric argument such as `123` or `#123` also selects it, but Gitee issue identifiers are alphanumeric: resolve the number to the real identifier with `gitee issue list --json --no-tui` before viewing. Treat every other non-empty argument as a description for a new Gitee issue, even when it contains words such as “fix,” “update,” or “resolve.” With no argument, ask for the issue description. Never implement a problem supplied as a non-identifier `gitx issue` description.
+Route `gitx issue` by argument shape, not by the intent implied by its wording. A known management subcommand—`list`, `edit`, `comment`, `assign`, `close`, `reopen`, or `start`—selects the corresponding management workflow in [Gitee issues](references/gitee-issues.md). An argument containing only a Gitee issue identifier, such as `ICX4FO` or `#ICX4FO`, selects the existing-issue implementation workflow. A purely numeric argument such as `123` or `#123` also selects it, but Gitee issue identifiers are alphanumeric: resolve the number to the real identifier with `gitee issue list --json --no-tui` before viewing. Treat every other non-empty argument as a description for a new Gitee issue, even when it contains words such as “fix,” “update,” or “resolve.” With no argument, ask for the issue description. Never implement a problem supplied as a non-identifier `gitx issue` description.
+
+Route `gitx pr` by argument shape. A known management subcommand—`list`, `view`, `edit`, `diff`, `review`, `comment`, `merge`, `close`, `reopen`, `checkout`, or `fetch`—selects the corresponding management workflow in [Pull requests](references/pull-requests.md). Any other argument is the destination base branch for PR creation.
 
 `gitx issue <description>` explicitly requests publication to Gitee. Repository-local tracker conventions do not redirect this command to local files; follow the [Gitee issue creation workflow](references/gitee-issues.md#create-a-new-issue), including its failure handling.
 
@@ -31,9 +33,18 @@ For `gitx ship [base]`, the optional argument is the PR's destination branch, ne
 | `gitx pull` | Safely pull updates for the current branch. |
 | `gitx push` | Push the current branch to `origin`. |
 | `gitx pr [base]` | Create a Gitee pull request into the supplied, configured, or default base branch. |
+| `gitx pr list/view/diff/review/comment/close/reopen/checkout <number>` | Manage existing pull requests; see [Pull requests](references/pull-requests.md). |
+| `gitx pr merge <number>` | Merge a pull request after explicit confirmation. |
 | `gitx ship [base]` | Create a feature branch when needed, run checks, commit, push, and open a PR into the supplied, configured, or default base branch. |
 | `gitx issue <description>` | Create a Gitee issue with a generated title and body. |
 | `gitx issue <id>` | Fix the Gitee issue with that identifier. |
+| `gitx issue list/edit/comment/assign/close/reopen <id>` | Manage existing issues; see [Gitee issues](references/gitee-issues.md). |
+| `gitx issue start <id>` | Claim an issue, create a working branch, and self-assign. |
+| `gitx release list/view/create/edit/delete` | Manage Gitee releases; deleting requires confirmation. |
+| `gitx repo view/list/clone/create/fork/delete` | Manage Gitee repositories; deleting is irreversible and requires confirmation. |
+| `gitx search repos/issues/users <query>` | Search across all of Gitee; read-only. |
+| `gitx api ...` | Call any Gitee V5 REST API endpoint when no first-class command exists. |
+| `gitx pipeline ...` | Manage Gitee Go pipelines, repository (`-R`) and project (`-E`/`-P`). |
 | `gitx resolve` | Resolve an in-progress merge or rebase conflict. |
 | `gitx check` | Run relevant checks, then create a smart commit. |
 | `gitx status` | Show Git status and changed-file summary; make no changes. |
@@ -108,7 +119,7 @@ For `gitx push`:
 
 ## Pull requests
 
-For `gitx pr [base]`, read [Pull requests](references/pull-requests.md) for base resolution, publication, existing-PR handling, and creation. That reference also owns the title, body, and readiness conventions shared with Ship. PR operations use the Gitee CLI and follow the official Gitee skill conventions: always pass `--json` and `--no-tui`, never pass `--ai`, and require explicit user confirmation before merging.
+For `gitx pr [base]`, read [Pull requests](references/pull-requests.md) for base resolution, publication, existing-PR handling, and creation. That reference also owns the title, body, and readiness conventions shared with Ship. PR operations use the Gitee CLI and follow the official Gitee skill conventions: always pass `--json` and `--no-tui`, never pass `--ai`, and require explicit user confirmation before merging. The same reference defines the full set of PR management operations for `gitx pr <subcommand>`.
 
 ## Ship
 
@@ -118,7 +129,27 @@ Reuse Branch naming, Smart commit selection and grouping, Checks detection, and 
 
 ## Gitee issues
 
-For `gitx issue`, use the argument-shape dispatch above, then read the selected workflow in [Gitee issues](references/gitee-issues.md). The reference defines prerequisites, implementation boundaries, and the new-issue template.
+For `gitx issue`, use the argument-shape dispatch above, then read the selected workflow in [Gitee issues](references/gitee-issues.md). The reference defines prerequisites, implementation boundaries, the new-issue template, and the management operations.
+
+## Releases
+
+For `gitx release ...`, read [Gitee releases](references/gitee-release.md). Deleting a release requires explicit confirmation before `--yes` is added, and unsupported operations fall back to the [Gitee API](references/gitee-api.md) reference.
+
+## Repositories
+
+For `gitx repo ...`, read [Gitee repositories](references/gitee-repo.md). Deleting a repository is irreversible: show the target and wait for explicit confirmation before running the delete.
+
+## Search
+
+For `gitx search ...`, read [Gitee search](references/gitee-search.md). Search is global across Gitee and read-only; to list or view the issues of a specific repository, use `gitx issue` instead.
+
+## Raw Gitee API
+
+For `gitx api ...`, read [Gitee API](references/gitee-api.md). Prefer first-class commands, discover endpoints with `gitee api --search`, and require a second explicit confirmation before PUT, PATCH, or DELETE requests.
+
+## Gitee Go pipelines
+
+For `gitx pipeline ...`, read [Gitee Go pipelines](references/gitee-go.md). Repository pipelines require `-R owner/repo`; project pipelines require `-E <enterprise id> -P <project id>`. Run, cancel, and rebuild have no built-in confirmation and need the user's explicit ok first.
 
 ## Conflict resolution
 

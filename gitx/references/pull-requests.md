@@ -29,3 +29,25 @@ Generate a concise PR title from the commits and diff. Generate a normal Markdow
 ```
 
 Add `--draft` if explicitly requested or if configured `draftPR` is true without an explicit readiness override; otherwise create it ready for review. Do not change an existing PR's readiness merely to match a preference.
+
+## PR management operations
+
+`gitx pr <subcommand>` routes the management verbs `list`, `view`, `edit`, `diff`, `review`, `comment`, `merge`, `close`, `reopen`, `checkout`, and `fetch` here. PR numbers are integers (e.g. `42`), unlike alphanumeric issue identifiers. All commands require an authenticated Gitee CLI, pass `--json` where supported plus `--no-tui`, and never use `--ai`.
+
+```bash
+gitee pr list --state open --json --no-tui                          # also --author/--assignee/--tester/--head/--base/--labels/--milestone-number/--since/--sort/--direction/--limit/--page
+gitee pr view 42 --json --no-tui                                     # fields: number,title,body,state,draft,mergeable,head,base,user,assignees,testers,html_url,created_at,merged_at
+gitee pr edit 42 -t "New title" -b "Updated body" --json --no-tui    # at least one of -t/-b/--draft; --draft=false unsets a draft
+gitee pr diff 42 --no-tui                                            # unified diff; --json=filename,status,additions,deletions for a structured summary
+gitee pr review 42 --no-tui                                          # approve; -b "LGTM" attaches a comment; --force is the admin override
+gitee pr comment 42 -b "..." --json --no-tui                         # -b is required or the command blocks on an editor
+gitee pr merge 42 --json --no-tui                                    # after confirmation; --method merge|squash|rebase, --delete-branch
+gitee pr close 42 --json --no-tui
+gitee pr reopen 42 --json --no-tui
+gitee pr checkout 42 --no-tui                                        # fetch and switch; --branch <name> renames pr_<number>; --force re-fetches
+gitee pr fetch 42 --no-tui                                           # fetch without switching
+```
+
+Merging is visible and hard to undo: show the PR title, author, head → base, merge method, and whether the source branch will be deleted, then wait for explicit confirmation before running `pr merge`. `checkout` and `fetch` are local git operations and do not support `--json`. When an operation has no direct command, fall back to the [Gitee API](gitee-api.md) reference.
+
+Common errors: `--title is required in non-interactive mode` (create without `-t`), `422` (a PR already exists for the branch — check with `pr list`), a hung command (`pr comment` without `-b`), `404` (wrong PR number), `405/409` on merge (conflicts or unmet requirements), `403` on review (insufficient permission), `could not detect current branch` (not in a git repository — add `-R owner/repo`), `authentication required` (run `gitee auth login`).
