@@ -2,12 +2,14 @@
 
 Turn messy AI-generated changes into clean, safe Git history.
 
-GitX is a portable Git workflow skill for AI coding agents that turns working-tree changes into logical Conventional Commits and handles branches, project checks, safe pull and push workflows, GitHub pull requests and issues, secret scanning, merge and rebase conflict resolution, repository status and history, and commit planning across Agent Skills-compatible tools.
+GitX is a portable Git workflow skill for AI coding agents that turns working-tree changes into logical Conventional Commits and handles branches, project checks, safe pull and push workflows, Gitee pull requests and issues, secret scanning, merge and rebase conflict resolution, repository status and history, and commit planning across Agent Skills-compatible tools.
+
+> **Gitee edition** — forked from [musoyangrigor/gitx-skill](https://github.com/musoyangrigor/gitx-skill). PR and issue operations use the official [Gitee CLI](https://gitee.com/oschina/gitee-cli) (`gitee`) instead of `gh`, and follow the official Gitee skill conventions: always `--json` and `--no-tui`, never `--ai`, explicit confirmation before merges, and the `gitee-api` fallback for unsupported operations. Commits, branches, and pushes are plain Git and work with any remote. Authenticate first with `gitee auth login`.
 
 ## Install
 
 ```bash
-npx skills add musoyangrigor/gitx-skill --skill gitx
+npx skills add NowPion/gitx-gitee-skill --skill gitx
 ```
 
 The Skills CLI configures the skill for the selected supported AI agent. Start a new agent session after installation.
@@ -26,12 +28,12 @@ A bare `$gitx` invocation immediately inspects the repository and runs Smart com
 | `$gitx branch check` | Create an inferred branch, run checks, then commit. |
 | `$gitx pull` | Safely pull updates for the current branch. |
 | `$gitx push` | Push the current branch to `origin`; create its upstream if needed. |
-| `$gitx pr` | Create a GitHub pull request into the configured base or `origin`'s default branch with a generated title and body. |
-| `$gitx pr develop` | Create a GitHub pull request from the current branch into `develop`. |
+| `$gitx pr` | Create a Gitee pull request into the configured base or `origin`'s default branch with a generated title and body. |
+| `$gitx pr develop` | Create a Gitee pull request from the current branch into `develop`. |
 | `$gitx ship` | Create a feature branch if needed, run checks, commit, push, and open a PR into the configured or default base branch. |
 | `$gitx ship dev` | Run the ship workflow and open a PR targeting `dev`. |
-| `$gitx issue Login fails after token expiry` | Create a GitHub issue with a generated title and body. |
-| `$gitx issue 123` | Read GitHub issue `#123` and implement the requested fix in the current working tree. |
+| `$gitx issue Login fails after token expiry` | Create a Gitee issue with a generated title and body. |
+| `$gitx issue ICX4FO` | Read the Gitee issue `ICX4FO` and implement the requested fix in the current working tree. A numeric reference like `123` is resolved to the real identifier with `gitee issue list` first. |
 | `$gitx resolve` | Resolve an in-progress merge or rebase conflict. |
 | `$gitx check` | Run relevant checks, then create a smart commit. |
 | `$gitx status` | Show repository status without changing anything. |
@@ -47,9 +49,9 @@ A bare `$gitx` invocation immediately inspects the repository and runs Smart com
 
 If GitX finds several logical commit groups, it asks whether to create the real number of commits or one commit.
 
-For `gitx issue`, only a number such as `123` or `#123` tells GitX to implement an existing issue. Any other text creates a new GitHub issue, including descriptions that use words such as “fix” or “update.”
+For `gitx issue`, only a Gitee issue identifier such as `ICX4FO` or `#ICX4FO` (or a numeric reference that gets resolved first) tells GitX to implement an existing issue. Any other text creates a new Gitee issue, including descriptions that use words such as “fix” or “update.”
 
-Issue descriptions target GitHub even in repositories with a local tracker. Missing prerequisites or creation failures are reported without substituting a local issue file.
+Issue descriptions target Gitee even in repositories with a local tracker. Missing prerequisites or creation failures are reported without substituting a local issue file.
 
 ## Usage
 
@@ -79,7 +81,7 @@ Explicit requests override saved preferences, and preferences override inferred 
 
 ## Workflow references
 
-Detailed behavior: [pull requests](gitx/references/pull-requests.md), [GitHub issues](gitx/references/github-issues.md), [secret scanning](gitx/references/secret-scanning.md), [shipping](gitx/references/ship.md), [diagnosis](gitx/references/doctor.md), and [splitting edits within one file](gitx/references/same-file-splitting.md).
+Detailed behavior: [pull requests](gitx/references/pull-requests.md), [Gitee issues](gitx/references/gitee-issues.md), [secret scanning](gitx/references/secret-scanning.md), [shipping](gitx/references/ship.md), [diagnosis](gitx/references/doctor.md), and [splitting edits within one file](gitx/references/same-file-splitting.md).
 
 ## Development
 

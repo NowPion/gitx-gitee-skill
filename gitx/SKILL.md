@@ -1,6 +1,6 @@
 ---
 name: gitx
-description: "Portable Git workflow skill for AI coding agents that turns messy AI-generated changes into clean Git history. Use for smart Conventional Commits, logical commit splitting, branches, checks, pull and push, GitHub PRs and issues, secret scanning, commit planning, Git status and history, repository diagnosis, and merge or rebase conflict resolution with Claude Code, OpenAI Codex, Cursor, and other Agent Skills-compatible tools."
+description: "Portable Git workflow skill for AI coding agents that turns messy AI-generated changes into clean Git history. Use for smart Conventional Commits, logical commit splitting, branches, checks, pull and push, Gitee PRs and issues, secret scanning, commit planning, Git status and history, repository diagnosis, and merge or rebase conflict resolution with Claude Code, OpenAI Codex, Cursor, and other Agent Skills-compatible tools."
 ---
 
 # GitX
@@ -15,9 +15,9 @@ Treat a bare invocation as an action, never as a help request. Do not announce t
 
 Match natural-language requests to the commands below. Route “check my changes” or “show git status” to Status when the user wants a read-only summary; route “run tests before committing” to Checks. Use Doctor for Git workflow diagnosis and Plan for a commit preview. Read supporting references only when their workflow or loading condition applies.
 
-Route `gitx issue` by argument shape, not by the intent implied by its wording. An argument containing only an issue number, such as `123` or `#123`, selects the existing-issue implementation workflow. Treat every other non-empty argument as a description for a new GitHub issue, even when it contains words such as “fix,” “update,” or “resolve.” With no argument, ask for the issue description. Never implement a problem supplied as a non-numeric `gitx issue` description.
+Route `gitx issue` by argument shape, not by the intent implied by its wording. An argument containing only a Gitee issue identifier, such as `ICX4FO` or `#ICX4FO`, selects the existing-issue implementation workflow. A purely numeric argument such as `123` or `#123` also selects it, but Gitee issue identifiers are alphanumeric: resolve the number to the real identifier with `gitee issue list --json --no-tui` before viewing. Treat every other non-empty argument as a description for a new Gitee issue, even when it contains words such as “fix,” “update,” or “resolve.” With no argument, ask for the issue description. Never implement a problem supplied as a non-identifier `gitx issue` description.
 
-`gitx issue <description>` explicitly requests publication to GitHub. Repository-local tracker conventions do not redirect this command to local files; follow the [GitHub issue creation workflow](references/github-issues.md#create-a-new-issue), including its failure handling.
+`gitx issue <description>` explicitly requests publication to Gitee. Repository-local tracker conventions do not redirect this command to local files; follow the [Gitee issue creation workflow](references/gitee-issues.md#create-a-new-issue), including its failure handling.
 
 For `gitx ship [base]`, the optional argument is the PR's destination branch, never the name of a new feature branch. For example, `gitx ship dev` targets `dev`. Dispatch to Ship, not directly to Branch or Pull requests.
 
@@ -30,10 +30,10 @@ For `gitx ship [base]`, the optional argument is the PR's destination branch, ne
 | `gitx branch check` | Create a default branch, run checks, then create a smart commit. |
 | `gitx pull` | Safely pull updates for the current branch. |
 | `gitx push` | Push the current branch to `origin`. |
-| `gitx pr [base]` | Create a GitHub pull request into the supplied, configured, or default base branch. |
+| `gitx pr [base]` | Create a Gitee pull request into the supplied, configured, or default base branch. |
 | `gitx ship [base]` | Create a feature branch when needed, run checks, commit, push, and open a PR into the supplied, configured, or default base branch. |
-| `gitx issue <description>` | Create a GitHub issue with a generated title and body. |
-| `gitx issue <number>` | Fix the GitHub issue with that number. |
+| `gitx issue <description>` | Create a Gitee issue with a generated title and body. |
+| `gitx issue <id>` | Fix the Gitee issue with that identifier. |
 | `gitx resolve` | Resolve an in-progress merge or rebase conflict. |
 | `gitx check` | Run relevant checks, then create a smart commit. |
 | `gitx status` | Show Git status and changed-file summary; make no changes. |
@@ -52,7 +52,7 @@ Before applying defaults for commits, planning, branches, checks, PRs, or ship, 
 
 Explicit user choices override saved preferences; saved preferences override GitX's inferred defaults. Required repository instructions and execution permissions still apply. Invalid configuration must be explained before a dependent mutation; read-only commands may report it without stopping unrelated inspection.
 
-For `gitx setup`, follow the reference to inspect local conventions, preview the exact proposed JSON, and create or update only the root `.gitx.json`. Setup does not run checks, stage, commit, push, create a PR, or require GitHub authentication.
+For `gitx setup`, follow the reference to inspect local conventions, preview the exact proposed JSON, and create or update only the root `.gitx.json`. Setup does not run checks, stage, commit, push, create a PR, or require Gitee authentication.
 
 ## Smart commit
 
@@ -108,7 +108,7 @@ For `gitx push`:
 
 ## Pull requests
 
-For `gitx pr [base]`, read [Pull requests](references/pull-requests.md) for base resolution, publication, existing-PR handling, and creation. That reference also owns the title, body, and readiness conventions shared with Ship.
+For `gitx pr [base]`, read [Pull requests](references/pull-requests.md) for base resolution, publication, existing-PR handling, and creation. That reference also owns the title, body, and readiness conventions shared with Ship. PR operations use the Gitee CLI and follow the official Gitee skill conventions: always pass `--json` and `--no-tui`, never pass `--ai`, and require explicit user confirmation before merging.
 
 ## Ship
 
@@ -116,9 +116,9 @@ For `gitx ship [base]`, read [Ship workflow](references/ship.md). The command au
 
 Reuse Branch naming, Smart commit selection and grouping, Checks detection, and project preferences. Read the shared [PR conventions](references/pull-requests.md#title-body-and-readiness) when preparing a PR. Ship's reference owns publication sequencing, including check failures and pushing before returning an existing PR.
 
-## GitHub issues
+## Gitee issues
 
-For `gitx issue`, use the argument-shape dispatch above, then read the selected workflow in [GitHub issues](references/github-issues.md). The reference defines prerequisites, implementation boundaries, and the new-issue template.
+For `gitx issue`, use the argument-shape dispatch above, then read the selected workflow in [Gitee issues](references/gitee-issues.md). The reference defines prerequisites, implementation boundaries, and the new-issue template.
 
 ## Conflict resolution
 
@@ -134,7 +134,7 @@ For `gitx resolve` or an in-progress merge or rebase conflict:
 
 For `gitx status`, show the current branch, staged files, unstaged files, untracked files, and a concise changed-file summary. Do not modify the repository.
 
-For `gitx tree`, show the current branch and upstream, a working-tree summary, ahead/behind counts against the upstream or `origin`, the current PR when available, and a compact graph of the most recent 20 commits. Do not fetch, pull, push, create branches, or otherwise modify the repository.
+For `gitx tree`, show the current branch and upstream, a working-tree summary, ahead/behind counts against the upstream or `origin`, the current PR when available (query with `gitee pr list --head <branch> --json --no-tui`), and a compact graph of the most recent 20 commits. Do not fetch, pull, push, create branches, or otherwise modify the repository.
 
 ## Repository diagnosis
 
